@@ -27,8 +27,74 @@ public class Main {
         }
         return -1;
     }
+
+    private static String resolveMonthFilePath(int monthIndex) {
+        // Primary: Data_Files/January.txt
+        String p1 = "Data_Files" + File.separator + months[monthIndex] + ".txt";
+        File f1 = new File(p1);
+        if (f1.exists() && f1.isFile()) return p1;
+
+        // Fallback: January.txt in current directory
+        String p2 = months[monthIndex] + ".txt";
+        File f2 = new File(p2);
+        if (f2.exists() && f2.isFile()) return p2;
+
+        // Return primary anyway; caller handles errors robustly
+        return p1;
+    }
     // ======== REQUIRED METHOD LOAD DATA (Students fill this) ========
     public static void loadData() {
+        for (int m = 0; m < MONTHS; m++) {
+            // dosya yolu
+            String filename = "Data_Files/" + months[m] + ".txt";
+            File file = new File(filename);
+
+            // dosya yoksa sessizce geç
+            if (!file.exists()) {
+                continue;
+            }
+
+            try {
+                Scanner sc = new Scanner(file);
+
+                // başlık satırını (Day,Commodity,Profit) atla
+                if (sc.hasNextLine()) {
+                    sc.nextLine();
+                }
+
+                while (sc.hasNextLine()) {
+                    String line = sc.nextLine();
+
+                    // boş satır varsa atla
+                    if (line.trim().isEmpty()) continue;
+
+                    // virgül ile ayır
+                    String[] parts = line.split(",");
+
+                    if (parts.length >= 3) {
+                        try {
+                            int day = Integer.parseInt(parts[0].trim());
+                            String commodityName = parts[1].trim();
+                            int profit = Integer.parseInt(parts[2].trim());
+
+                            int dayIndex = day - 1; // Gün 1 -> Index 0
+                            int commIndex = getCommodityIndex(commodityName);
+
+                            // veri sınırlarını kontrol et ve kaydet
+                            if (dayIndex >= 0 && dayIndex < DAYS && commIndex != -1) {
+                                profitData[m][dayIndex][commIndex] = profit;
+                            }
+                        } catch (NumberFormatException e) {
+                            // hatayı sessizce geç
+                        }
+                    }
+                }
+                sc.close();
+            } catch (FileNotFoundException e) {
+                // sessiz kal
+            }
+        }
+    }
     }
 
     // ======== 10 REQUIRED METHODS (Students fill these) ========
