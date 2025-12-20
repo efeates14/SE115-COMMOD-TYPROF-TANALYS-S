@@ -101,13 +101,39 @@ public class Main {
 
     // ======== 10 REQUIRED METHODS (Students fill these) ========
 
+    // ay: 0=January 11=December
+    // dönüş: "Commodity totalProfit"  | geçersiz ay: "INVALID_MONTH"
     public static String mostProfitableCommodityInMonth(int month) {
-        return "DUMMY";
+        if (!isValidMonth(month)) return "INVALID_MONTH";
+
+        int bestIdx = 0;
+        int bestSum = Integer.MIN_VALUE;
+
+        for (int c = 0; c < COMMS; c++) {
+            int sum = 0;
+            for (int d = 0; d < DAYS; d++) {
+                sum += profitData[month][d][c];
+            }
+            if (sum > bestSum) {
+                bestSum = sum;
+                bestIdx = c;
+            }
+        }
+        return commodities[bestIdx] + " " + bestSum;
     }
 
+    // dönüş: o gün tüm emtiaların toplam kârı
+    // geçersiz ay veya gün: -99999
     public static int totalProfitOnDay(int month, int day) {
-        return 1234;
+        if (!isValidMonth(month) || !isValidDay(day)) return -99999;
+        int total = 0;
+        int di = day - 1;
+        for (int c = 0; c < COMMS; c++) {
+            total += profitData[month][di][c];
+        }
+        return total;
     }
+
 
     public static int commodityProfitInRange(String commodity, int from, int to) {
         return 1234;
