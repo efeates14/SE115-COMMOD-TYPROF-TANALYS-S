@@ -9,8 +9,11 @@ public class Main {
     static String[] commodities = {"Gold", "Oil", "Silver", "Wheat", "Copper"};
     static String[] months = {"January","February","March","April","May","June",
             "July","August","September","October","November","December"};
-
+    // profitData[ayIndex][gunIndex][emtiaIndex] = kâr
+    // ayIndex: 0..11, gunIndex: 0..27 (1. gün => index 0), emtiaIndex: 0..4
     static int[][][] profitData = new int[MONTHS][DAYS][COMMS];
+
+    // yardımcı metotlar
 
     private static boolean isValidMonth(int month) {
         return month >= 0 && month < MONTHS;
@@ -20,6 +23,7 @@ public class Main {
         return day >= 1 && day <= DAYS;
     }
 
+    /** emtia indexini (0..4) döndürür. bulunamazsa ya da geçersizse -1 döndürür. büyük küçük harf duyarlı */
     private static int getCommodityIndex(String commodity) {
         if (commodity == null) return -1;
         for (int i = 0; i < COMMS; i++) {
@@ -28,73 +32,71 @@ public class Main {
         return -1;
     }
 
-    private static String resolveMonthFilePath(int monthIndex) {
-        // Primary: Data_Files/January.txt
-        String p1 = "Data_Files" + File.separator + months[monthIndex] + ".txt";
-        File f1 = new File(p1);
-        if (f1.exists() && f1.isFile()) return p1;
-
-        // Fallback: January.txt in current directory
-        String p2 = months[monthIndex] + ".txt";
-        File f2 = new File(p2);
-        if (f2.exists() && f2.isFile()) return p2;
-
-        // Return primary anyway; caller handles errors robustly
-        return p1;
+    /** dosya yolu oluştur zorunlu klasör adı "Data_Files" olmalı */
+    private static Path monthFilePath(int monthIndex) {
+        // Zorunlu yapı: Data_Files/January.txt ... Data_Files/December.txt
+        return Paths.get("Data_Files", months[monthIndex] + ".txt");
     }
-    // ======== REQUIRED METHOD LOAD DATA (Students fill this) ========
-    public static void loadData() {
-        for (int m = 0; m < MONTHS; m++) {
-            // dosya yolu
-            String filename = "Data_Files/" + months[m] + ".txt";
-            File file = new File(filename);
 
-            // dosya yoksa sessizce geç
-            if (!file.exists()) {
-                continue;
-            }
-
-            try {
-                Scanner sc = new Scanner(file);
-
-                // başlık satırını (Day,Commodity,Profit) atla
-                if (sc.hasNextLine()) {
-                    sc.nextLine();
-                }
-
-                while (sc.hasNextLine()) {
-                    String line = sc.nextLine();
-
-                    // boş satır varsa atla
-                    if (line.trim().isEmpty()) continue;
-
-                    // virgül ile ayır
-                    String[] parts = line.split(",");
-
-                    if (parts.length >= 3) {
-                        try {
-                            int day = Integer.parseInt(parts[0].trim());
-                            String commodityName = parts[1].trim();
-                            int profit = Integer.parseInt(parts[2].trim());
-
-                            int dayIndex = day - 1; // Gün 1 -> Index 0
-                            int commIndex = getCommodityIndex(commodityName);
-
-                            // veri sınırlarını kontrol et ve kaydet
-                            if (dayIndex >= 0 && dayIndex < DAYS && commIndex != -1) {
-                                profitData[m][dayIndex][commIndex] = profit;
-                            }
-                        } catch (NumberFormatException e) {
-                            // hatayı sessizce geç
-                        }
-                    }
-                }
-                sc.close();
-            } catch (FileNotFoundException e) {
-                // sessiz kal
-            }
+    /** güvenli integer parse; hata olursa null döndürür (asla exception fırlatmaz). */
+    private static Integer tryParseInt(String s) {
+        if (s == null) return null;
+        try {
+            return Integer.parseInt(s.trim());
+        } catch (Exception e) {
+            return null;
         }
     }
+
+    // ======== REQUIRED METHOD LOAD DATA (Students fill this) ========
+    public static void loadData() {
+        // diziyi 0 la sıfırla (loadData() birden fazla kez çağrılsa da sağlam çalışsın)
+        for (int m = 0; m < MONTHS; m++) {
+            for (int d = 0; d < DAYS; d++) {
+                for (int c = 0; c < COMMS; c++) {
+                    profitData[m][d][c] = 0;
+                }
+            }
+        }
+
+        // her ay dosyasını oku ve profitData dizisini doldur
+        for (int m = 0; m < MONTHS; m++) {
+            Scanner reader = null;
+            try {
+                reader = new Scanner(monthFilePath(m));
+                while (reader.hasNextLine()) {
+                    String line = reader.nextLine();
+                    if (line == null) continue;
+                    line = line.trim();
+                    if (line.length() == 0) continue;
+
+                    // varsa başlığı atla: Day,Commodity,Profit
+                    if (line.startsWith("Day")) continue;
+
+                    // beklenen format: Day,Commodity,Profit
+                    String[] parts = line.split(",");
+                    if (parts.length != 3) continue;
+
+                    Integer day = tryParseInt(parts[0]);
+                    String comm = parts[1] == null ? null : parts[1].trim();
+                    Integer profit = tryParseInt(parts[2]);
+
+                    if (day == null || profit == null) continue;
+                    if (!isValidDay(day)) continue;
+                    int ci = getCommodityIndex(comm);
+                    if (ci == -1) continue;
+
+                    profitData[m][day - 1][ci] = profit;
+                }
+            } catch (Exception e) {
+                // asla exception fırlatma / ekrana yazdırma.
+                // dosya yoksa ya da okunamazsa o ay için değerler 0 kalır.
+            } finally {
+                if (reader != null) {
+                    try { reader.close(); } catch (Exception ignored) {}
+                }
+            }
+        }
     }
 
     // ======== 10 REQUIRED METHODS (Students fill these) ========
