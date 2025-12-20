@@ -135,24 +135,100 @@ public class Main {
     }
 
 
+    //  dönüş: emtianın tüm aylar boyunca verilen gün aralığındaki toplam kârı
+    // geçersiz emtia, aralık, veya from > to: -99999
     public static int commodityProfitInRange(String commodity, int from, int to) {
-        return 1234;
+        int ci = getCommodityIndex(commodity);
+        if (ci == -1) return -99999;
+        if (!isValidDay(from) || !isValidDay(to)) return -99999;
+        if (from > to) return -99999;
+
+        int sum = 0;
+        for (int m = 0; m < MONTHS; m++) {
+            for (int day = from; day <= to; day++) {
+                sum += profitData[m][day - 1][ci];
+            }
+        }
+        return sum;
     }
 
+    // dönüş: o ay içindeki en yüksek toplam kârın olduğu gün numarası (1-28)
+    // geçersiz ay: -1
     public static int bestDayOfMonth(int month) {
-        return 1234;
+        if (!isValidMonth(month)) return -1;
+
+        int bestDay = 1;
+        int bestTotal = Integer.MIN_VALUE;
+        for (int day = 1; day <= DAYS; day++) {
+            int total = 0;
+            int di = day - 1;
+            for (int c = 0; c < COMMS; c++) {
+                total += profitData[month][di][c];
+            }
+            if (total > bestTotal) {
+                bestTotal = total;
+                bestDay = day;
+            }
+        }
+        return bestDay;
     }
 
+
+    // dönüş: bu emtia için toplam kârı en yüksek olan ayın adı
+    // geçersiz emtia: "INVALID_COMMODITY"
     public static String bestMonthForCommodity(String comm) {
-        return "DUMMY";
+        int ci = getCommodityIndex(comm);
+        if (ci == -1) return "INVALID_COMMODITY";
+
+        int bestMonth = 0;
+        int bestSum = Integer.MIN_VALUE;
+        for (int m = 0; m < MONTHS; m++) {
+            int sum = 0;
+            for (int d = 0; d < DAYS; d++) {
+                sum += profitData[m][d][ci];
+            }
+            if (sum > bestSum) {
+                bestSum = sum;
+                bestMonth = m;
+            }
+        }
+        return months[bestMonth];
     }
 
+    // dönüş: yıl boyunca (tüm aylar) ardışık negatif kâr günlerinin en uzun serisi
+    // geçersiz emtia: -1
     public static int consecutiveLossDays(String comm) {
-        return 1234;
+        int ci = getCommodityIndex(comm);
+        if (ci == -1) return -1;
+
+        int best = 0;
+        int current = 0;
+        for (int m = 0; m < MONTHS; m++) {
+            for (int d = 0; d < DAYS; d++) {
+                if (profitData[m][d][ci] < 0) {
+                    current++;
+                    if (current > best) best = current;
+                } else {
+                    current = 0;
+                }
+            }
+        }
+        return best;
     }
 
+    // dönüş: yıl boyunca kârı threshold (rşik) değerinden büyük olan gün sayısı
+    // geçersiz emtia: -1
     public static int daysAboveThreshold(String comm, int threshold) {
-        return 1234;
+        int ci = getCommodityIndex(comm);
+        if (ci == -1) return -1;
+
+        int count = 0;
+        for (int m = 0; m < MONTHS; m++) {
+            for (int d = 0; d < DAYS; d++) {
+                if (profitData[m][d][ci] > threshold) count++;
+            }
+        }
+        return count;
     }
 
     public static int biggestDailySwing(int month) {
