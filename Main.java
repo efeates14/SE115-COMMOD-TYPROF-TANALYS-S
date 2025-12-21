@@ -231,13 +231,53 @@ public class Main {
         return count;
     }
 
+    // dönüş: bir ay içinde ardışık iki günün toplam kârı arasındaki en büyük mutlak fark
+    // geçersiz ay: -99999
     public static int biggestDailySwing(int month) {
-        return 1234;
+        if (!isValidMonth(month)) return -99999;
+
+        int bestSwing = 0;
+
+        // 1. günün toplam kârı
+        int prevTotal = 0;
+        for (int c = 0; c < COMMS; c++) {
+            prevTotal += profitData[month][0][c];
+        }
+
+        // 2..28. günleri bir önceki günle kıyasla
+        for (int d = 1; d < DAYS; d++) {
+            int currTotal = 0;
+            for (int c = 0; c < COMMS; c++) {
+                currTotal += profitData[month][d][c];
+            }
+            int swing = Math.abs(currTotal - prevTotal);
+            if (swing > bestSwing) bestSwing = swing;
+            prevTotal = currTotal;
+        }
+        return bestSwing;
     }
 
+    // dönüş: "C1 is better by X" veya "C2 is better by X" veya "Equal"
+    // geçersiz emtia: "INVALID_COMMODITY"
     public static String compareTwoCommodities(String c1, String c2) {
-        return "DUMMY is better by 1234";
+        int i1 = getCommodityIndex(c1);
+        int i2 = getCommodityIndex(c2);
+        if (i1 == -1 || i2 == -1) return "INVALID_COMMODITY";
+
+        int s1 = 0;
+        int s2 = 0;
+        for (int m = 0; m < MONTHS; m++) {
+            for (int d = 0; d < DAYS; d++) {
+                s1 += profitData[m][d][i1];
+                s2 += profitData[m][d][i2];
+            }
+        }
+
+        if (s1 == s2) return "Equal";
+        if (s1 > s2) return c1 + " is better by " + (s1 - s2);
+        return c2 + " is better by " + (s2 - s1);
     }
+
 
     public static String bestWeekOfMonth(int month) {
         return "DUMMY";
