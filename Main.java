@@ -50,7 +50,7 @@ public class Main {
 
     // ======== REQUIRED METHOD LOAD DATA (Students fill this) ========
     public static void loadData() {
-        // diziyi 0 la sıfırla (loadData() birden fazla kez çagrılsa da sağlam çalışsın)
+        // diziyi 0 la sıfırla (loadData() birden fazla kez çağırılsa da sağlam çalışsın)
         for (int m = 0; m < MONTHS; m++) {
             for (int d = 0; d < DAYS; d++) {
                 for (int c = 0; c < COMMS; c++) {
@@ -70,7 +70,7 @@ public class Main {
                     line = line.trim();
                     if (line.length() == 0) continue;
 
-                    // varsa başlıgi atla: Day,Commodity,Profit
+                    // varsa baslığı atla: Day,Commodity,Profit
                     if (line.startsWith("Day")) continue;
 
                     // beklenen format: Day,Commodity,Profit
@@ -89,7 +89,7 @@ public class Main {
                     profitData[m][day - 1][ci] = profit;
                 }
             } catch (Exception e) {
-                // asla exception fırlatma / ekrana yazdırma
+                //asla exception fırlatma / ekrana yazdırma.
                 // dosya yoksa ya da okunamazsa o ay için değerler 0 kalır
             } finally {
                 if (reader != null) {
@@ -122,8 +122,8 @@ public class Main {
         return commodities[bestIdx] + " " + bestSum;
     }
 
-    // dönuş: o gün tüm emtiaların toplam karı
-    // geçersiz ay veya gün: -99999
+    // dönüş= o gün tüm emtiaların toplam kârı
+    //  geçersiz ay veya gün: -99999
     public static int totalProfitOnDay(int month, int day) {
         if (!isValidMonth(month) || !isValidDay(day)) return -99999;
         int total = 0;
@@ -195,7 +195,7 @@ public class Main {
         return months[bestMonth];
     }
 
-    // donus: yıl boyunca (tüm aylar) ardışık negatif kâr günlerinin en uzun serisi
+    // dönüş= yıl boyunca (tüm aylar) ardışık negatif kâr günlerinin en uzun serisi
     // geçersiz emtia: -1
     public static int consecutiveLossDays(String comm) {
         int ci = getCommodityIndex(comm);
@@ -216,8 +216,8 @@ public class Main {
         return best;
     }
 
-    // dönüş: yıl boyunca karı threshold (rşik) değerinden büyük olan gün sayısı
-    // gecersiz emtia: -1
+    // dönüş: yıl boyunca kârı threshold (eşik) değerinden büyük olan gün sayısı
+    // geçersiz emtia: -1
     public static int daysAboveThreshold(String comm, int threshold) {
         int ci = getCommodityIndex(comm);
         if (ci == -1) return -1;
@@ -231,7 +231,7 @@ public class Main {
         return count;
     }
 
-    // dönüş: bir ay içinde ardışık iki günün toplam karı arasındaki en büyük mutlak fark
+    // dönüş= bir ay içinde ardışık iki günün toplam kârı arasındaki en büyük mutlak fark
     // geçersiz ay: -99999
     public static int biggestDailySwing(int month) {
         if (!isValidMonth(month)) return -99999;
@@ -258,7 +258,7 @@ public class Main {
     }
 
     // dönüş: "C1 is better by X" veya "C2 is better by X" veya "Equal"
-    // geçersiz emtia: "INVALID_COMMODITY"
+    //  geçersiz emtia: "INVALID_COMMODITY"
     public static String compareTwoCommodities(String c1, String c2) {
         int i1 = getCommodityIndex(c1);
         int i2 = getCommodityIndex(c2);
@@ -314,20 +314,4 @@ public class Main {
     }
 }
 
-
-
-
-// ------------------------------------------------------------
-// bu projede 12 ay, her ay 28 gün ve 5 emtia olacak şekilde kâr verileri
-// 3 boyutlu bir dizi (int[][][]) kullanılarak tutulmuştur
-// profitData[ay][gün][emtia]
-// ay indexleri 0–11 araliginndadır (January = 0, December = 11)
-// günler kullanıcıya 1–28 olarak sunulur dizide 0–27 olarak tutulur
-// emtialar commodities[] dizisindeki sıraya göre indexli
-//
-// veri okuma işlemi loadData() metodunda gerçekleştirildi
-// dosyalar Data_Files klasöründen ay ay okunur.
-// hatalı satırlar, eksik dosyalar veya parse hataları programı durdurmaz (robust
-// geçersiz ay gün veya emtia durumlarında exception fırlatılmaz (robust
-// projede belirtilen özel hata değerleri döndürülür (robust
 
