@@ -50,7 +50,7 @@ public class Main {
 
     // ======== REQUIRED METHOD LOAD DATA (Students fill this) ========
     public static void loadData() {
-        // diziyi 0 la sıfırla (loadData() birden fazla kez çağrılsa da sağlam çalışsın)
+        // diziyi 0 la sıfırla (loadData() birden fazla kez çagrılsa da sağlam çalışsın)
         for (int m = 0; m < MONTHS; m++) {
             for (int d = 0; d < DAYS; d++) {
                 for (int c = 0; c < COMMS; c++) {
@@ -70,7 +70,7 @@ public class Main {
                     line = line.trim();
                     if (line.length() == 0) continue;
 
-                    // varsa başlığı atla: Day,Commodity,Profit
+                    // varsa başlıgi atla: Day,Commodity,Profit
                     if (line.startsWith("Day")) continue;
 
                     // beklenen format: Day,Commodity,Profit
@@ -89,8 +89,8 @@ public class Main {
                     profitData[m][day - 1][ci] = profit;
                 }
             } catch (Exception e) {
-                // asla exception fırlatma / ekrana yazdırma.
-                // dosya yoksa ya da okunamazsa o ay için değerler 0 kalır.
+                // asla exception fırlatma / ekrana yazdırma
+                // dosya yoksa ya da okunamazsa o ay için değerler 0 kalır
             } finally {
                 if (reader != null) {
                     try { reader.close(); } catch (Exception ignored) {}
@@ -122,7 +122,7 @@ public class Main {
         return commodities[bestIdx] + " " + bestSum;
     }
 
-    // dönüş: o gün tüm emtiaların toplam kârı
+    // dönuş: o gün tüm emtiaların toplam karı
     // geçersiz ay veya gün: -99999
     public static int totalProfitOnDay(int month, int day) {
         if (!isValidMonth(month) || !isValidDay(day)) return -99999;
@@ -152,7 +152,7 @@ public class Main {
         return sum;
     }
 
-    // dönüş: o ay içindeki en yüksek toplam kârın olduğu gün numarası (1-28)
+    // dönüş: o ay içindeki en yüksek toplam karın olduğu gün numarası (1-28)
     // geçersiz ay: -1
     public static int bestDayOfMonth(int month) {
         if (!isValidMonth(month)) return -1;
@@ -195,7 +195,7 @@ public class Main {
         return months[bestMonth];
     }
 
-    // dönüş: yıl boyunca (tüm aylar) ardışık negatif kâr günlerinin en uzun serisi
+    // donus: yıl boyunca (tüm aylar) ardışık negatif kâr günlerinin en uzun serisi
     // geçersiz emtia: -1
     public static int consecutiveLossDays(String comm) {
         int ci = getCommodityIndex(comm);
@@ -216,8 +216,8 @@ public class Main {
         return best;
     }
 
-    // dönüş: yıl boyunca kârı threshold (rşik) değerinden büyük olan gün sayısı
-    // geçersiz emtia: -1
+    // dönüş: yıl boyunca karı threshold (rşik) değerinden büyük olan gün sayısı
+    // gecersiz emtia: -1
     public static int daysAboveThreshold(String comm, int threshold) {
         int ci = getCommodityIndex(comm);
         if (ci == -1) return -1;
@@ -231,7 +231,7 @@ public class Main {
         return count;
     }
 
-    // dönüş: bir ay içinde ardışık iki günün toplam kârı arasındaki en büyük mutlak fark
+    // dönüş: bir ay içinde ardışık iki günün toplam karı arasındaki en büyük mutlak fark
     // geçersiz ay: -99999
     public static int biggestDailySwing(int month) {
         if (!isValidMonth(month)) return -99999;
@@ -279,12 +279,37 @@ public class Main {
     }
 
 
+    // hafta 1: gün 1-7, hafta 2: 8-14, hafta 3: 15-21, hafta 4: 22-28
+    // dönüş: toplam karı en yüksek olan haftayı "Week k" formatında döndürür
+    // geçersiz ay: "INVALID_MONTH"
     public static String bestWeekOfMonth(int month) {
-        return "DUMMY";
+        if (!isValidMonth(month)) return "INVALID_MONTH";
+
+        int bestWeek = 1;
+        int bestSum = Integer.MIN_VALUE;
+
+        for (int w = 1; w <= 4; w++) {
+            int startDay = (w - 1) * 7 + 1;
+            int endDay = w * 7;
+
+            int sum = 0;
+            for (int day = startDay; day <= endDay; day++) {
+                int di = day - 1;
+                for (int c = 0; c < COMMS; c++) {
+                    sum += profitData[month][di][c];
+                }
+            }
+
+            if (sum > bestSum) {
+                bestSum = sum;
+                bestWeek = w;
+            }
+        }
+        return "Week " + bestWeek;
     }
 
     public static void main(String[] args) {
         loadData();
-        System.out.println("Data loaded – ready for queries");
+        System.out.println("Data loaded - ready for queries");
     }
 }
