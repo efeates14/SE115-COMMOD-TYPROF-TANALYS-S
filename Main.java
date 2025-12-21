@@ -315,3 +315,17 @@ public class Main {
 }
 
 
+
+// ------------------------------------------------------------
+// bu projede 12 ay, her ay 28 gün ve 5 emtia olacak şekilde kâr verileri 3 boyutlu bir dizi (int[][][]) kullanılarak tutulmuştur
+// profitData[ay][gün][emtia]
+// ay indexleri 0–11 araliginndadır (January = 0, December = 11)
+// günler kullanıcıya 1–28 olarak sunulur dizide 0–27 olarak tutulur
+// emtialar commodities[] dizisindeki sıraya göre indexli
+//-------------------------------
+// veri okuma işlemi loadData() metodunda gerçekleştirildi
+// dosyalar Data_Files klasöründen ay ay okunur.
+// hatalı satırlar, eksik dosyalar veya parse hataları programı durdurmaz (robust)
+// geçersiz ay gün veya emtia durumlarında exception fırlatılmaz (robust)
+// projede belirtilen özel hata değerleri döndürülür (robust)
+
