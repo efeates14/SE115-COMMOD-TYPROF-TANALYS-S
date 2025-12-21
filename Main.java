@@ -32,10 +32,10 @@ public class Main {
         return -1;
     }
 
-    /** dosya yolu oluştur zorunlu klasör adı "Data_Files" olmalı */
-    private static Path monthFilePath(int monthIndex) {
+    /** dosya yolu oluştur zorunlu klasör adı "Data_Files" olmalı, dosyalar klasörün içinde ay isimleriyle tutuluyor */
+    private static File monthFilePath(int monthIndex) {
         // Zorunlu yapı: Data_Files/January.txt ... Data_Files/December.txt
-        return Paths.get("Data_Files", months[monthIndex] + ".txt");
+        return new File("Data_Files/" + months[monthIndex] + ".txt");
     }
 
     /** güvenli integer parse; hata olursa null döndürür (asla exception fırlatmaz). */
